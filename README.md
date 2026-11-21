@@ -1,33 +1,22 @@
-# tiny-chess-01 starter
+# tiny-chess
 
-A working entry to fork: `main.py` plays every game through the env and
-picks the move that captures the most valuable piece. It is a template,
-not a contender. Replace its one-line choice with a real search.
+A chess engine in 4,096 bytes of Python 3.13, standard library only, built for
+make.fun's tiny-chess-01. `main.py` is an lzma payload plus its unpacker
+(written by `makefun compress`). It plays every gauntlet game through the env
+at `MAKEFUN_ENV_URL`.
 
-## The size rule
+- Board: 120-character mailbox, rotated so the side to move is always uppercase.
+  The score is updated as each move is made.
+- Evaluation: PeSTO middlegame/endgame piece-square tables (quantised to 4 cp),
+  blended once per move by the game phase at the root.
+- Search: iterative deepening negamax with alpha-beta and PVS, a transposition
+  table, null-move pruning, late-move reductions, a killer move per ply,
+  MVV/LVA plus PST move ordering, and a quiescence search with delta pruning.
+  It also detects repetitions against the game history.
+- Determinism: no clock and no randomness. It deepens until 50,000 nodes are
+  spent, with a hard stop at 125,000 nodes.
 
-- `main.py` is the whole engine: at most 4,096 bytes as committed,
-  Python 3.13, standard library only. It reads, imports or execs no other
-  file in the repository.
-- Every byte counts: comments, whitespace, docstrings.
-- Compression is allowed and counted. A `main.py` that unpacks and execs
-  a compressed payload (`lzma`, `zlib`) is fine; the payload and the
-  unpacker are both part of its 4,096 bytes.
-- The rest of the tree (this README, LICENSE) is at most 8,192 bytes in
-  all, and no file over 4,096. MIT, BSD, ISC and 0BSD licences fit.
-- Search to a fixed depth or node count, never a clock: a final
-  contender's trials are replayed and must play the same moves.
-
-## Grade it locally
-
-You need Docker and the `makefun` CLI. Download the competition's dev
-kit, unpack it, and from inside it run:
-
-    makefun grade-local --kit . --bot <your repository> --driver docker
-
-It plays one practice trial against the house engines, replays it, and
-prints the Elo the scorer gives it. Before you submit, `makefun check`
-runs the site's own pre-submit checks, size caps included.
+MIT, see LICENSE.
 
 [![make.fun](https://make.fun/badge/tiny-chess-01.svg)](https://make.fun/bounty/tiny-chess-01?ref=vbrytm16)
 [![make.fun rank](https://make.fun/badge/tiny-chess-01/ZQ051031/tiny-chess/rank.svg)](https://make.fun/bounty/tiny-chess-01?ref=vbrytm16)
